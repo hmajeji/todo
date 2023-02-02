@@ -1,0 +1,3 @@
+go shopping
+play games
+do python
