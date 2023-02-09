@@ -1,0 +1,40 @@
+It is possible to use GitHub Actions for this.
+
+This allows you to run code on every push. That code can then check the changed files and send E-Mails (or other notifications) to users that should be notified.
+
+How you could do this
+The commit SHA of the old version (before the push) can be obtained using ${{  github.event.before }} and the commit SHA of the new version (after the push) can be obtained using The commit SHA of the old version (before the push) can be obtained using${{ github.event.after }}`.
+
+Those commit hashes can then be compared with the command git diff --name-only ${{  github.event.before }} ${{  github.event.after }}.
+
+Those changes could then be processed and an E-Mail sent to the people you want to notify.
+
+My action
+I have created an action that does exactly this.
+
+You basically create a workflow like this:
+
+name: 'Notify users on file change'
+on:
+  push:
+    branches: [ master ]
+jobs:
+  notif:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: git@github.com:hmajeji/todo.git
+        with: 
+          # Address to send E-Mails from
+          senderEmail: ${{ secrets.MAIL_USERNAME }}
+          # optional, The subject of the E-Mails to send
+          subjectLine: 'GitHub file change notification'
+          # A file in the repository or HTTP address that contains file patterns with E-Mail addresses that should be notified on file changes
+          mailingList: ${{ secrets.MAIL_USERNAME }}
+          # The SMTP server used to send E-Mails
+          smtpServer: ${{ secrets.SMTP_SERVER }}
+          # optional, The SMTP port used to send E-Mails
+          smtpPort: 587
+          # The SMTP user name used to send E-Mails
+          smtpUsername: ${{ secrets.SMTP_USER }}
+          # The SMTP password used to send E-Mails
+          smtpPassword: ${{ secrets.SMTP_PASSWORD }}
